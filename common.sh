@@ -37,21 +37,21 @@ VALIDATE(){
 
 nodejs_setup(){
 
-    echo "Disabling other versions of Nodejs"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Disabling other versions of Nodejs"
     dnf module disable nodejs -y &>>$LOGS_FILE
     VALIDATE $? "Disabling other versions of Nodejs"
 
-    echo "Enabling V.20 of NodeJS"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Enabling V.20 of NodeJS"
     dnf module enable nodejs:20 -y &>>$LOGS_FILE
     VALIDATE $? "Enabling V.20 of NodeJS"
 
-    echo "Installing NodeJS"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Installing NodeJS"
     dnf install nodejs -y &>>$LOGS_FILE
     VALIDATE $? "Installing NodeJS"
 
     cd /app 
 
-    echo "Installing Dependencies"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Installing Dependencies"
     npm install &>>$LOGS_FILE
     VALIDATE $? "Installing Dependencies"
 
@@ -63,47 +63,47 @@ app_setup(){
     if [ $? -eq 0 ]; then
         echo -e " Roboshop user already exists - $Y skipping to create new user again$N" 
     else
-        echo "Creating Sysytem User"
+        echo "$(date "+%Y-%m-%d %H:%M:%S") | Creating Sysytem User"
         useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOGS_FILE
         VALIDATE $? "Creating Sysytem User"
     fi
 
-    echo "Creating App Directory"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Creating App Directory"
     mkdir -p /app &>>$LOGS_FILE
     VALIDATE $? "Creating App Directory"
 
-    echo "Downloading $appname code"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Downloading $appname code"
     curl -o /tmp/$app_name.zip https://roboshop-artifacts.s3.amazonaws.com/$app_name-v3.zip &>>$LOGS_FILE
     VALIDATE $? "Downloading catalog code"
 
-    echo "Opening app Directory"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Opening app Directory"
     cd /app 
     VALIDATE $? "Opening app Directory"
 
-    echo "Removing all existing files in App directory"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Removing all existing files in App directory"
     rm -rf /app/* &>>$LOGS_FILE
     VALIDATE $? "Removing all existing files in App directory"
 
-    echo "Unzipping the downloaded code"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Unzipping the downloaded code"
     unzip /tmp/$app_name.zip &>>$LOGS_FILE
     VALIDATE $? "Unzipping the downloaded code"
 }
 
 systemd_setup(){
     
-    echo "Creating Systemctl Service"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Creating Systemctl Service"
     cp $SCRIPT_DIR/$app_name.service /etc/systemd/system/$app_name.service &>>$LOGS_FILE
     VALIDATE $? "Creating Systemctl Service"
 
-    echo "Loading the Service"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Loading the Service"
     systemctl daemon-reload &>>$LOGS_FILE
     VALIDATE $? "Loading the Service"
 
-    echo "Enabling $app_name Server"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Enabling $app_name Server"
     systemctl enable $app_name &>>$LOGS_FILE
     VALIDATE $? "Enabling $app_name Server"
 
-    echo "Starting $app_name Server"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Starting $app_name Server"
     systemctl start $app_name &>>$LOGS_FILE
     VALIDATE $? "Starting Catalogue Server"
 
@@ -111,15 +111,17 @@ systemd_setup(){
 
 app_restart(){
 
-    echo "Restarting $app_name Server"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Restarting $app_name Server"
     systemctl restart $app_name &>>$LOGS_FILE
     VALIDATE $? "Restarting $app_name Server"
 
 }
 
+echo "$(date "+%Y-%m-%d %H:%M:%S") | Script ended executing at: $(date)" | tee -a $LOGS_FILE
+
 print_total_time(){
 
     END_TIME=$(date +%s)
-    TOTAL_TIME=$(($END_TIME - $START_TIME))
+    TOTAL_TIME=$(($END_TIME - $START_TIME)) &>>$LOGS_FILE
     echo -e "$(date "+%Y-%m-%d %H:%M:%S") | Script executed in $G $TOTAL_TIME seconds $N" | tee -a $LOGS_FILE
 }
