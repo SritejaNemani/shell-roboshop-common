@@ -27,4 +27,4 @@ echo "Restarting MongoDB Server"
 systemctl restart mongod 
 VALIDATE $? "Restarting MongoDB Server"
 
-print_total_time()
+print_total_time

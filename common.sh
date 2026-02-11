@@ -33,6 +33,80 @@ VALIDATE(){
    fi
 }
 
+nodejs_setup(){
+
+    echo "Disabling other versions of Nodejs"
+    dnf module disable nodejs -y &>>$LOGS_FILE
+    VALIDATE $? "Disabling other versions of Nodejs"
+
+    echo "Enabling V.20 of NodeJS"
+    dnf module enable nodejs:20 -y &>>$LOGS_FILE
+    VALIDATE $? "Enabling V.20 of NodeJS"
+
+    echo "Installing NodeJS"
+    dnf install nodejs -y &>>$LOGS_FILE
+    VALIDATE $? "Installing NodeJS"
+
+    cd /app 
+
+    echo "Installing Dependencies"
+    npm install &>>$LOGS_FILE
+    VALIDATE $? "Installing Dependencies"
+
+}
+
+app_setup(){
+
+    id roboshop &>>$LOGS_FILE
+    if [ $? -eq 0 ]; then
+        echo -e " Roboshop user already exists - $Y skipping to create new user again$N" 
+    else
+        echo "Creating Sysytem User"
+        useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOGS_FILE
+        VALIDATE $? "Creating Sysytem User"
+    fi
+
+    echo "Creating App Directory"
+    mkdir -p /app &>>$LOGS_FILE
+    VALIDATE $? "Creating App Directory"
+
+    echo "Downloading $appname code"
+    curl -o /tmp/$app_name.zip https://roboshop-artifacts.s3.amazonaws.com/$app_name-v3.zip &>>$LOGS_FILE
+    VALIDATE $? "Downloading catalog code"
+
+    echo "Opening app Directory"
+    cd /app 
+    VALIDATE $? "Opening app Directory"
+
+    echo "Removing all existing files in App directory"
+    rm -rf /app/* &>>$LOGS_FILE
+    VALIDATE $? "Removing all existing files in App directory"
+
+    echo "Unzipping the downloaded code"
+    unzip /tmp/$app_name.zip &>>$LOGS_FILE
+    VALIDATE $? "Unzipping the downloaded code"
+}
+
+systemd_setup(){
+    
+    echo "Creating Systemctl Service"
+    cp $SCRIPT_DIR/$app_name.service /etc/systemd/system/$app_name.service &>>$LOGS_FILE
+    VALIDATE $? "Creating Systemctl Service"
+
+    echo "Loading the Service"
+    systemctl daemon-reload &>>$LOGS_FILE
+    VALIDATE $? "Loading the Service"
+
+    echo "Enabling $app_name Server"
+    systemctl enable $app_name &>>$LOGS_FILE
+    VALIDATE $? "Enabling $app_name Server"
+
+    echo "Starting $app_name Server"
+    systemctl start $app_name &>>$LOGS_FILE
+    VALIDATE $? "Starting Catalogue Server"
+
+}
+
 print_total_time(){
 
     END_TIME=$(date +%s)
