@@ -9,7 +9,7 @@ Y="\e[33m" #yellow
 N="\e[0m" #normal-white
 SCRIPT_DIR=$PWD
 START_TIME=$(date +%s)
-#MONGODB_HOST=mongodb.nemani.online
+MONGODB_HOST=mongodb.nemani.online
 
 echo "$(date "+%Y-%m-%d %H:%M:%S") | Script started executing at: $(date)" | tee -a $LOGS_FILE
 
