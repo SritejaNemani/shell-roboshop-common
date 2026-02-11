@@ -29,7 +29,7 @@ VALIDATE(){
       echo -e "$(date "+%Y-%m-%d %H:%M:%S") | $2 $R Failure $N" | tee -a $LOGS_FILE # $2 2nd arg is Insatll nginx(package)
       exit 1 # here if it is one installation like prev screipt exiit 1 isn't required but here if we don'r exit the script will continue with next installations which may lead to problem
    else 
-      echo -e "$(date "+%Y-%m-%d %H:%M:%S") |$2 $G Success $N" | tee -a $LOGS_FILE
+      echo -e "$(date "+%Y-%m-%d %H:%M:%S") | $2 $G Success $N" | tee -a $LOGS_FILE
    fi
 }
 
@@ -104,6 +104,14 @@ systemd_setup(){
     echo "Starting $app_name Server"
     systemctl start $app_name &>>$LOGS_FILE
     VALIDATE $? "Starting Catalogue Server"
+
+}
+
+app_restart(){
+
+    echo "Restarting $app_name Server"
+    systemctl restart $app_name &>>$LOGS_FILE
+    VALIDATE $? "Restarting $app_name Server"
 
 }
 
