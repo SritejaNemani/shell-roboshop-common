@@ -10,6 +10,7 @@ N="\e[0m" #normal-white
 SCRIPT_DIR=$PWD
 START_TIME=$(date +%s)
 MONGODB_HOST=mongodb.nemani.online
+MYSQL_HOST=mysql.nemani.online
 
 mkdir -p $LOGS_FOLDER
 
@@ -54,6 +55,24 @@ nodejs_setup(){
     echo "$(date "+%Y-%m-%d %H:%M:%S") | Installing Dependencies"
     npm install &>>$LOGS_FILE
     VALIDATE $? "Installing Dependencies"
+
+}
+
+java_setup(){
+
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Installing Maven"
+    dnf install maven -y &>>$LOGS_FILE
+    VALIDATE $? "Installing Maven"
+
+    cd /app 
+
+    echo "Installing and building $app_name"
+    mvn clean package &>>$LOGS_FILE
+    VALIDATE $? "Installing and building $app_name"
+
+    echo "Moving and Remnaming $app_name"
+    mv target/$app_name-1.0.jar $app_name.jar
+    VALIDATE $? "Moving and Remnaming $app_name"
 
 }
 
