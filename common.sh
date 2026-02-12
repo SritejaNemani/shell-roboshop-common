@@ -76,6 +76,19 @@ java_setup(){
 
 }
 
+python_setup(){
+
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Installing Python"
+    dnf install python3 gcc python3-devel -y &>>$LOGS_FILE
+    VALIDATE $? "Installing Python"
+
+
+    echo "$(date "+%Y-%m-%d %H:%M:%S") | Installing Dependencies"
+    pip3 install -r requirements.txt &>>$LOGS_FILE
+    VALIDATE $? "Installing Dependencies"
+
+}
+
 app_setup(){
 
     id roboshop &>>$LOGS_FILE
