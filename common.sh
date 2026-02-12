@@ -61,7 +61,7 @@ app_setup(){
 
     id roboshop &>>$LOGS_FILE
     if [ $? -eq 0 ]; then
-        echo -e " Roboshop user already exists - $Y skipping to create new user again$N" 
+        echo -e "$(date "+%Y-%m-%d %H:%M:%S") | Roboshop user already exists - $Y skipping to create new user again$N" 
     else
         echo "$(date "+%Y-%m-%d %H:%M:%S") | Creating Sysytem User"
         useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOGS_FILE
@@ -105,7 +105,7 @@ systemd_setup(){
 
     echo "$(date "+%Y-%m-%d %H:%M:%S") | Starting $app_name Server"
     systemctl start $app_name &>>$LOGS_FILE
-    VALIDATE $? "Starting Catalogue Server"
+    VALIDATE $? "Starting $app_name Server"
 
 }
 
